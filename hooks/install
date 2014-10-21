@@ -1,0 +1,43 @@
+#!/bin/bash
+
+set -ex
+
+# Install is guaranteed to run once per rootfs
+
+echo "Installing kubernetes-node on $JUJU_UNIT_NAME"
+
+TGT_DIR=/usr/local/bin
+
+echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 \
+            --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
+apt-get update
+apt-get install -y lxc-docker bridge-utils
+
+#apt-get install -y -q docker.io
+
+# nsinit is broken / docker exec in 1.3 / noted in kub #1469 nsenter is better
+# golang git mercurial bzr
+
+bzip2 -k -c -d $CHARM_DIR/files/kubelet.amd64.bz2 > $TGT_DIR/kubelet
+chmod 555 $TGT_DIR/kubelet
+
+bzip2 -k -c -d $CHARM_DIR/files/proxy.amd64.bz2 > $TGT_DIR/proxy
+chmod 555 $TGT_DIR/proxy
+
+groupadd kubernetes
+useradd -d /var/lib/kubernetes \
+    -G docker \
+    -g kubernetes \
+    -s /sbin/nologin \
+    --system \
+    kubernetes
+
+#usermod -a -G docker ubuntu
+install -d -m 0744 -o kubernetes -g kubernetes /var/lib/kubernetes
+install -d -m 0744 -o kubernetes -g kubernetes /etc/kubernetes/manifests
+
+# wait for the world, depends on where we installed it from distro
+#sudo service docker.io stop
+# or upstream archive
+#sudo service docker stop
