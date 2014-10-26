@@ -1,4 +1,4 @@
-destination: charmhelpers
+destination: hooks/charmhelpers
 branch: lp:charmhelpers
 include:
   - core

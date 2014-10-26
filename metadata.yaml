@@ -10,4 +10,4 @@ requires:
     interface: kubernetes-api
   network:
     interface: overlay-network
-    scope: container
+
