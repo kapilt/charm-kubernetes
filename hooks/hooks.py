@@ -13,6 +13,12 @@ from charmhelpers.core import hookenv, host
 hooks = hookenv.Hooks()
 
 
+@hooks.hook('config-changed')
+def config_changed():
+    """Called whenever our configuration changes. no op atm.
+    """
+
+
 @hooks.hook('etcd-relation-changed',
             'api-relation-changed',
             'network-relation-changed')
