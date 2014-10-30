@@ -20,10 +20,9 @@ To get started :
     juju add-relation etcd kubernetes-master
     juju add-relation kubernetes kubernetes-master
 
-
-To use, get a kubecfg binary (available in binary tarball download)
-and point it to the master with :
-
+To use, get a kubecfg binary (available in binary tarball download @
+http://github.com/GoogleCloudPlatform/kubernetes/releases) and point it
+to the master with:
 
     $ juju status kubernetes-master | grep public
     public-address: 104.131.108.99
