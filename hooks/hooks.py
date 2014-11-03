@@ -4,6 +4,7 @@ import json
 import httplib
 import os
 import time
+import socket
 import subprocess
 import sys
 import urlparse
@@ -66,14 +67,25 @@ def get_template_data():
         api_servers = "http://%s:%s" % (api_info[0], api_info[1])
 
     template_data['overlay_type'] = overlay_type
-    template_data['kubelet_bind_addr'] = hookenv.unit_private_ip()
-    template_data['proxy_bind_addr'] = hookenv.unit_get('public-address')
+    template_data['kubelet_bind_addr'] = _bind_addr(
+        hookenv.unit_private_ip())
+    template_data['proxy_bind_addr'] = _bind_addr(
+        hookenv.unit_get('public-address'))
     template_data['kubeapi_server'] = api_servers
     template_data['etcd_servers'] = ",".join([
         'http://%s:%s' % (s[0], s[1]) for s in sorted(etcd_servers)])
     template_data['identifier'] = os.environ['JUJU_UNIT_NAME'].replace(
         '/', '-')
     return _encode(template_data)
+
+
+def _bind_addr(addr):
+    if addr.replace('.', '').isdigit():
+        return addr
+    try:
+        return socket.gethostbyname(addr)
+    except socket.error:
+            raise ValueError("Could not resolve private address")
 
 
 def _encode(d):
