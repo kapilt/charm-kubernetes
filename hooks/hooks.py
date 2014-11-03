@@ -38,15 +38,15 @@ def relation_changed():
     # Setup kubernetes supplemental group
     setup_kubernetes_group()
 
-    # Register machine via api
-    print("Registering machine")
-    register_machine(template_data['kubeapi_server'])
-
     # Register services
     for n in ("cadvisor", "kubelet", "proxy"):
         if render_upstart(n, template_data) or not host.service_running(n):
             print("Starting %s" % n)
             host.service_restart(n)
+
+    # Register machine via api
+    print("Registering machine")
+    register_machine(template_data['kubeapi_server'])
 
     # Save the marker (for restarts to detect prev install)
     template_data.save()
